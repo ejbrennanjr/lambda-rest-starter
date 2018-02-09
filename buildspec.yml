@@ -1,0 +1,15 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - npm install
+      - npm run build
+      - npm run zip
+artifacts:
+  files:
+    - dist/handler.zip
+    # The sam.yml file is not part of the lambda function. 
+    # It is needed for the CodePipeline Deploy step.  
+    - sam.yml
+  discard-paths: yes

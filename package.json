@@ -1,0 +1,30 @@
+{
+  "name": "lambda-rest-starter",
+  "version": "1.0.0",
+  "description": "A starter project for AWS Lambda & API Gateway development",
+  "main": "index.js",
+  "scripts": {
+    "build": "babel-node tools/build.js",
+    "test": "test",
+    "zip": "zip -r dist/handler.zip dist/bundle.js",
+    "create-stack": "aws cloudformation create-stack --stack-name lambda-rest-serverless-stack --template-body file://cicd-pipeline/pipeline.yml --parameters file://cicd-pipeline/pipeline-params.json --capabilities CAPABILITY_NAMED_IAM",
+    "delete-stack": "aws cloudformation delete-stack --stack-name lambda-rest-serverless-stack"
+  },
+  "author": "EJB",
+  "license": "MIT",
+  "devDependencies": {
+    "aws-sam-local": "^0.2.6",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.1",
+    "clean-webpack-plugin": "^0.1.17",
+    "colors": "^1.1.2",
+    "uglifyjs-webpack-plugin": "^1.1.6",
+    "webpack": "^3.10.0"
+  },
+  "dependencies": {
+    "adm-zip": "^0.4.7",
+    "aws-sdk": "^2.185.0"
+  }
+}

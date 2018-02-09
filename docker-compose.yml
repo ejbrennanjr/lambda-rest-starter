@@ -1,0 +1,26 @@
+version: '2'
+
+# Will want to revisit this page when I go to setup SAM in docker-compose
+# https://github.com/awslabs/aws-sam-local/issues/55
+
+services:
+  serverless-node9-awscli: 
+    build: 
+      context: .
+      dockerfile: .docker/serverless.node9.awscli.dockerfile
+    env_file:
+      - .secrets/secrets.env
+    volumes: 
+      - /var/run/docker.sock:/var/run/docker.sock 
+      - .:/home/node/app
+    ports:
+      - "3001:3000"
+    command: npm start
+
+
+# docker-compose build
+# docker-compose run --rm --service-ports serverless-node9-awscli npm run build
+# 
+# https://github.com/awslabs/aws-sam-local/issues/208
+# docker-compose run --rm --user root --service-ports serverless-node9-awscli /home/node/.npm-global/bin/sam local start-api -t /home/node/app/sam.yml --docker-volume-basedir $(pwd -P) --host 0.0.0.0
+
