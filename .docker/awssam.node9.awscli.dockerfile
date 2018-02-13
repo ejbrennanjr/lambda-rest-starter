@@ -9,6 +9,10 @@ FROM node9-awscli
 # https://github.com/awslabs/aws-sam-local/issues/66
 # https://github.com/awslabs/aws-sam-local/issues/129
 
+USER root
+
+RUN gpasswd -a node staff
+
 USER node
 
 RUN npm install -g aws-sam-local
@@ -26,7 +30,7 @@ EXPOSE 3000
 CMD ["npm", "start"]
 
 # Build
-# docker build -f .docker/serverless.node9.awscli.dockerfile -t serverless-node9-awscli .
+# docker build -f .docker/awssam.node9.awscli.dockerfile -t awssam-node9-awscli .
 
 # Run
-# docker run --rm -p 3000:3000 -v $(PWD):/var/www serverless-node9-awscli
+# docker run --rm -p 3000:3000 -v $(PWD):/var/www awssam-node9-awscli

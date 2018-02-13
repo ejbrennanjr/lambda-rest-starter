@@ -4,10 +4,12 @@ version: '2'
 # https://github.com/awslabs/aws-sam-local/issues/55
 
 services:
-  serverless-node9-awscli: 
+  awssam-node9-awscli: 
     build: 
       context: .
-      dockerfile: .docker/serverless.node9.awscli.dockerfile
+      dockerfile: .docker/awssam.node9.awscli.dockerfile
+    environment:
+      - SAM_DOCKER_VOLUME_BASEDIR=$PWD      
     env_file:
       - .secrets/secrets.env
     volumes: 
@@ -19,8 +21,8 @@ services:
 
 
 # docker-compose build
-# docker-compose run --rm --service-ports serverless-node9-awscli npm run build
+# docker-compose run --rm --service-ports awssam-node9-awscli npm run build
 # 
 # https://github.com/awslabs/aws-sam-local/issues/208
-# docker-compose run --rm --user root --service-ports serverless-node9-awscli /home/node/.npm-global/bin/sam local start-api -t /home/node/app/sam.yml --docker-volume-basedir $(pwd -P) --host 0.0.0.0
+# docker-compose run --rm --user root --service-ports awssam-node9-awscli /home/node/.npm-global/bin/sam local start-api -t /home/node/app/sam.yml --docker-volume-basedir $(pwd -P) --host 0.0.0.0
 

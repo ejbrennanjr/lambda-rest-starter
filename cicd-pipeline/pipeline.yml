@@ -1,0 +1,356 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Continuous Delivery Pipeline'
+Parameters: 
+  AppName: 
+    Description: 'The name of the application'
+    Type: String 
+  GitHubUser: 
+    Description: 'The user of the GitHub repository, must have access to the GitHubToken'
+    Type: String
+  GitHubOAuthToken:
+    Description: 'The OAuthToken of the GitHub user'
+    Type: String
+  GitHubRepo:
+    Description: 'The GitHub repository'
+    Type: String 
+  GitHubRepoBranch:
+    Description: 'The GitHub repository branch'
+    Type: String
+
+Resources:
+
+  # --------------------------------------------------------------------------------------
+  # S3 Artifact Bucket Definitions
+  #  Resources:
+  #  - S3ArtifactBucket Bucket Definition
+  #  - S3ArtifactBucketPolicy Bucket Policy Definition
+  #  Leveraged:
+  #   CodePipeline will leverage this location for all artifacts created during the 
+  #   pipeline execution
+  # --------------------------------------------------------------------------------------
+
+  S3ArtifactBucket: 
+    Description: 'S3 Bucket for storing build artifacts'
+    Type: 'AWS::S3::Bucket'
+    Properties: 
+      BucketName: !Sub '${AppName}-build-s3-${AWS::Region}'      
+      VersioningConfiguration:
+        Status: Enabled
+  S3ArtifactBucketPolicy:
+    DependsOn:
+    - S3ArtifactBucket
+    Description: Setting Amazon S3 bucket policy for external and AWS CodePipeline access
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3ArtifactBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Id: SSEAndSSLPolicy
+        Statement:
+        - Sid: DenyUnEncryptedObjectUploads
+          Effect: Deny
+          Principal: "*"
+          Action: s3:PutObject
+          Resource: !Sub '${S3ArtifactBucket.Arn}/*'
+          Condition:
+            StringNotEquals:
+              s3:x-amz-server-side-encryption: aws:kms
+        - Sid: DenyInsecureConnections
+          Effect: Deny
+          Principal: "*"
+          Action: s3:*
+          Resource: !Sub '${S3ArtifactBucket.Arn}/*'
+          Condition:
+            Bool:
+              aws:SecureTransport: 'false'  
+
+
+  # --------------------------------------------------------------------------------------
+  # CodeBuild Definitions
+  #  Resources:
+  #  - CodeBuildCompileLambda Project for Lambda Build Definition
+  #  - CodeBuild IAM Role and Policy
+  #  Leveraged:
+  #   CodePipeline will leverage this CodeBuild Projects. 
+  #      CodeBuildCompileLambda: Will compile the Lambda Function
+  # --------------------------------------------------------------------------------------
+
+  CodeBuildIAMRole:
+    Type: AWS::IAM::Role
+    Description: 'IAM Role leveraged by the CodeBuild Projects used in this Stack'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: 
+            - codebuild.amazonaws.com
+          Action: 
+          - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: !Sub '${AppName}-codebuild-policy-iam-${AWS::Region}'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+                Effect: Allow
+                Resource: '*'
+              - Action:
+                - s3:PutObject
+                - s3:GetObject
+                - s3:GetObjectVersion
+                - s3:ListBucket
+                Effect: Allow
+                Resource: 
+                - arn:aws:s3:::codepipeline-us-east-1-*
+                - !Sub 'arn:aws:s3:::*'
+      RoleName: !Sub '${AppName}-codebuild-role-iam-${AWS::Region}'
+  CodeBuildCompileLambda:
+    DependsOn:
+    - CodeBuildIAMRole  
+    Type: 'AWS::CodeBuild::Project'
+    Properties:
+      Artifacts: 
+        Type: 'CODEPIPELINE'
+      Description: 'AWS CodeBuild Project used to compile the Lambda Function source'
+      Environment:
+        ComputeType: 'BUILD_GENERAL1_SMALL'
+        Image: 'aws/codebuild/nodejs:7.0.0'
+        Type: 'LINUX_CONTAINER'
+      Name: !Sub '${AppName}-compilelambda-codebuild-${AWS::Region}'
+      ServiceRole: !Sub '${CodeBuildIAMRole.Arn}'
+      Source:
+        BuildSpec: buildspec.yml
+        Type: CODEPIPELINE
+      TimeoutInMinutes: 5
+
+
+  # --------------------------------------------------------------------------------------
+  # CloudFormation Definitions
+  #  Resources:
+  #  - CloudFormationIAMRole IAM Role and Policy leveraged by CloudFormation Actions
+  #    in the CodePipeline.  This Action will create Lambda Function
+  # --------------------------------------------------------------------------------------
+
+  CloudFormationIAMRole:
+    Description: 'IAM Role leveraged by the CloudFormation Actions of the CodePipeline created in this Stack'
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [cloudformation.amazonaws.com]
+          Action: sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: !Sub '${AppName}-cloudformation-policy-iam-${AWS::Region}'
+          PolicyDocument:
+            Statement:
+            - Action: ["s3:*"]
+              Resource: "*"
+              Effect: Allow          
+            - Action: ["lambda:*"]
+              Resource: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:*"
+              Effect: Allow
+            - Action: ["apigateway:*"]
+              Resource: !Sub "arn:aws:apigateway:${AWS::Region}::*"
+              Effect: Allow
+            - Action: ["iam:GetRole", "iam:CreateRole", "iam:DeleteRole"]
+              Resource: !Sub "arn:aws:iam::${AWS::AccountId}:role/${AppName}-*"
+              Effect: Allow
+            - Action: ["iam:AttachRolePolicy", "iam:DetachRolePolicy"]
+              Resource: !Sub "arn:aws:iam::${AWS::AccountId}:role/${AppName}-*"
+              Effect: Allow
+            - Action: ["iam:PassRole"]
+              Resource: ["*"]
+              Effect: Allow
+            - Action: ["cloudformation:CreateChangeSet"]
+              Resource: !Sub "arn:aws:cloudformation:${AWS::Region}:aws:transform/Serverless-2016-10-31"
+              Effect: Allow
+      RoleName: !Sub '${AppName}-cloudformation-role-iam-${AWS::Region}'      
+
+
+
+  # --------------------------------------------------------------------------------------
+  # CodePipeline Definitions
+  #  Resources:
+  #  - CodePipeline Pipeline for compiling a Lambda Function from source and deploying
+  #  - CodePipelineIAMRole  IAM Role and Policy leveraged by the CodePipeline
+  #  Leveraged:
+  #   CodePipeline will troll specified GitHub repository, compile the Lambda Function source,
+  #   create the necessary Lambda infrastructure, and deploy the compiled source to 
+  #   Lambda service.
+  # --------------------------------------------------------------------------------------
+
+  CodePipelineIAMRole:
+    Type: 'AWS::IAM::Role'
+    Description: 'IAM Role leveraged by the CodePipeline created in this Stack'
+    Properties:
+      AssumeRolePolicyDocument: 
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 
+              - 'codepipeline.amazonaws.com'
+            Action:
+            - 'sts:AssumeRole'
+      Policies:
+        # https://docs.aws.amazon.com/codepipeline/latest/userguide/how-to-custom-role.html
+        - PolicyName: !Sub '${AppName}-codepipeline-policy-iam-${AWS::Region}'
+          PolicyDocument:
+            Statement:
+            - Action:
+              - s3:GetObject
+              - s3:GetObjectVersion
+              - s3:GetBucketVersioning
+              Resource: "*"
+              Effect: Allow
+            - Action:
+              - s3:PutObject
+              Resource:
+              - arn:aws:s3:::codepipeline*
+              - arn:aws:s3:::elasticbeanstalk*
+              Effect: Allow
+            - Action:
+              - codecommit:CancelUploadArchive
+              - codecommit:GetBranch
+              - codecommit:GetCommit
+              - codecommit:GetUploadArchiveStatus
+              - codecommit:UploadArchive
+              Resource: "*"
+              Effect: Allow
+            - Action:
+              - codedeploy:CreateDeployment
+              - codedeploy:GetApplicationRevision
+              - codedeploy:GetDeployment
+              - codedeploy:GetDeploymentConfig
+              - codedeploy:RegisterApplicationRevision
+              Resource: "*"
+              Effect: Allow
+            - Action:
+              - elasticbeanstalk:*
+              - ec2:*
+              - elasticloadbalancing:*
+              - autoscaling:*
+              - cloudwatch:*
+              - s3:*
+              - sns:*
+              - cloudformation:*
+              - rds:*
+              - sqs:*
+              - ecs:*
+              - iam:PassRole
+              Resource: "*"
+              Effect: Allow
+            - Action:
+              - lambda:InvokeFunction
+              - lambda:ListFunctions
+              Resource: "*"
+              Effect: Allow
+            - Action:
+              - opsworks:CreateDeployment
+              - opsworks:DescribeApps
+              - opsworks:DescribeCommands
+              - opsworks:DescribeDeployments
+              - opsworks:DescribeInstances
+              - opsworks:DescribeStacks
+              - opsworks:UpdateApp
+              - opsworks:UpdateStack
+              Resource: "*"
+              Effect: Allow
+            - Action:
+              - codebuild:BatchGetBuilds
+              - codebuild:StartBuild
+              Resource: "*"
+              Effect: Allow
+            Version: '2012-10-17'
+      Path: '/'
+      RoleName: !Sub '${AppName}-codepipeline-role-iam-${AWS::Region}'      
+  CodePipeline:
+    Type: 'AWS::CodePipeline::Pipeline'
+    Properties: 
+      ArtifactStore:
+        Location: !Ref S3ArtifactBucket
+        Type: S3
+      RoleArn: !Sub '${CodePipelineIAMRole.Arn}'
+      #https://docs.aws.amazon.com/codepipeline/latest/userguide/integrations-action-type.html#integrations-deploy
+      #https://docs.aws.amazon.com/codepipeline/latest/userguide/reference-pipeline-structure.html#action-requirements
+      Stages:
+        - Name: Source
+          Actions: 
+          - Name: Source
+            ActionTypeId:
+              Category: Source
+              Owner: ThirdParty
+              Version: 1
+              Provider: GitHub
+            OutputArtifacts:
+            - Name: sourceoutput
+            Configuration:
+              Owner: !Ref GitHubUser
+              Repo: !Ref GitHubRepo
+              Branch: !Ref GitHubRepoBranch
+              OAuthToken: !Ref GitHubOAuthToken
+        - Name: Build
+          Actions:
+          - Name: Build
+            InputArtifacts:
+            - Name: sourceoutput 
+            ActionTypeId:
+              Category: Build
+              Owner: AWS
+              Version: 1
+              Provider: CodeBuild
+            OutputArtifacts:
+            - Name: buildoutput
+            Configuration:
+              ProjectName: !Sub '${AppName}-compilelambda-codebuild-${AWS::Region}'
+            RunOrder: 1
+        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/continuous-delivery-codepipeline-action-reference.html    
+        - Name: Deploy
+          Actions:
+          - Name: CreateChangeSet
+            InputArtifacts:
+            - Name: buildoutput
+            ActionTypeId:
+              Category: Deploy
+              Owner: AWS
+              Version: "1"
+              Provider: CloudFormation
+            OutputArtifacts: []
+            Configuration:
+              StackName: !Sub "${AppName}-lambda-cloudformation-${AWS::Region}"
+              ActionMode: CHANGE_SET_REPLACE
+              RoleArn: !Sub '${CloudFormationIAMRole.Arn}'
+              ChangeSetName: pipeline-changeset
+              Capabilities: CAPABILITY_NAMED_IAM
+              TemplatePath: buildoutput::sam.yml
+              TemplateConfiguration: buildoutput::lambda-params.json
+            RunOrder: 1
+          - Name: ExecuteChangeSet
+            InputArtifacts: []
+            ActionTypeId:
+              Category: Deploy
+              Owner: AWS
+              Version: "1"
+              Provider: CloudFormation
+            OutputArtifacts: []
+            Configuration:
+              StackName: !Sub "${AppName}-lambda-cloudformation-${AWS::Region}"
+              ActionMode: CHANGE_SET_EXECUTE
+              ChangeSetName: pipeline-changeset
+            RunOrder: 2
+Outputs:
+  S3ArtifactBucketArn:
+    Value: !Sub '${S3ArtifactBucket.Arn}'
+    Description: 'ARN for S3 Artifact Bucket'
+  S3ArtifactBucketLambdaURL:
+    Value: !Sub '${S3ArtifactBucket.WebsiteURL}'
+    Description: 'URL for S3 Artifact Bucket'         

@@ -1,0 +1,15 @@
+{
+    "Parameters" : {
+      "AppName" : "lambda-rest-starter"
+    },
+    "StackPolicy" : {
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "NotAction" : "Update:Delete",
+          "Principal": "*",
+          "Resource" : "*"
+        }
+      ]
+    }
+  }

@@ -8,6 +8,11 @@ FROM awscli
 # https://raesene.github.io/blog/2016/03/06/The-Dangers-Of-Docker.sock/
 
 
+# RUN groupadd --gid 1000 node \
+#  && useradd --uid 1000 --gid node --shell /bin/bash --create-home node \
+#  && gpasswd -a node staff
+
+
 RUN groupadd --gid 1000 node \
   && useradd --uid 1000 --gid node --shell /bin/bash --create-home node
 
@@ -22,6 +27,7 @@ RUN apt-get update && apt-get install nano
 ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
 
 USER node
+
 RUN mkdir ~/.npm-global \
     && mkdir ~/app 
 

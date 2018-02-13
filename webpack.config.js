@@ -9,7 +9,7 @@ const GLOBALS = {
 
 export default {
     devtool: 'source-map',
-    entry: path.resolve(__dirname, 'src/index'),
+    entry: path.resolve(__dirname, 'index'),
     target: 'node',    
     plugins: [
         new CleanWebpackPlugin(['dist']),

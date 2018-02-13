@@ -12,4 +12,5 @@ artifacts:
     # The sam.yml file is not part of the lambda function. 
     # It is needed for the CodePipeline Deploy step.  
     - sam.yml
+    - cicd-pipeline/lambda-params.json  
   discard-paths: yes
