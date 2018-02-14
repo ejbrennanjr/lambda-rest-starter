@@ -8,6 +8,8 @@ phases:
       - npm install
       - npm run build
       - npm run zip
+      - ls
+      - ls dist
       - aws cloudformation package --template sam.yml --s3-bucket $S3_BUCKET --output-template post-sam.yml
 artifacts:
   files:
