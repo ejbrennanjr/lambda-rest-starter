@@ -332,7 +332,7 @@ Resources:
               ChangeSetName: pipeline-changeset
               Capabilities: CAPABILITY_NAMED_IAM
               TemplatePath: buildoutput::sam.yml
-              TemplateConfiguration: buildoutput::lambda-params.json
+              # TemplateConfiguration: buildoutput::lambda-params.json
             RunOrder: 1
           - Name: ExecuteChangeSet
             InputArtifacts: []

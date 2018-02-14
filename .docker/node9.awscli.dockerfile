@@ -8,33 +8,31 @@ FROM awscli
 # https://raesene.github.io/blog/2016/03/06/The-Dangers-Of-Docker.sock/
 
 
+
+# Went away from the below.  Now setting up a common user -- neo.
+# User is created in the awscli.dockerfile
 # RUN groupadd --gid 1000 node \
-#  && useradd --uid 1000 --gid node --shell /bin/bash --create-home node \
-#  && gpasswd -a node staff
+#  && useradd --uid 1000 --gid node --shell /bin/bash --create-home node
 
 
-RUN groupadd --gid 1000 node \
-  && useradd --uid 1000 --gid node --shell /bin/bash --create-home node
-
+USER root
 
 # commands needed to install nodejs and npm
 RUN curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash - && \
     apt-get update && \
     apt-get install -y nodejs
 
-RUN apt-get update && apt-get install nano
+USER neo
 
-ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
-
-USER node
+ENV NPM_CONFIG_PREFIX=/home/neo/.npm-global
 
 RUN mkdir ~/.npm-global \
     && mkdir ~/app 
 
-WORKDIR /home/node/app
+WORKDIR /home/neo/app
 
 # Build
 # docker build -f .docker/node9.awscli.dockerfile -t node9-awscli .
 
 # Run
-# docker run -p 3000:3000 -v $(PWD):/home/node/app node9-awscli
+# docker run -p 3000:3000 -v $(PWD):/home/neo/app node9-awscli

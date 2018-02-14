@@ -14,7 +14,7 @@ services:
       - .secrets/secrets.env
     volumes: 
       - /var/run/docker.sock:/var/run/docker.sock 
-      - .:/home/node/app
+      - .:/home/neo/app
     ports:
       - "3001:3000"
     command: npm start
@@ -24,5 +24,5 @@ services:
 # docker-compose run --rm --service-ports awssam-node9-awscli npm run build
 # 
 # https://github.com/awslabs/aws-sam-local/issues/208
-# docker-compose run --rm --user root --service-ports awssam-node9-awscli /home/node/.npm-global/bin/sam local start-api -t /home/node/app/sam.yml --docker-volume-basedir $(pwd -P) --host 0.0.0.0
+# docker-compose run --rm --service-ports awssam-node9-awscli /home/neo/.npm-global/bin/sam local start-api -t /home/neo/app/sam.yml --host 0.0.0.0
 

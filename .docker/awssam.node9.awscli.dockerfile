@@ -11,19 +11,17 @@ FROM node9-awscli
 
 USER root
 
-RUN gpasswd -a node staff
+RUN gpasswd -a neo staff
 
-USER node
+USER neo
 
 RUN npm install -g aws-sam-local
-
-WORKDIR /home/node/app
 
 COPY package.json .
 
 RUN npm install
 
-VOLUME ["/home/node/app", "/home/node/app/node_modules"]
+VOLUME ["/home/neo/app", "/home/neo/app/node_modules"]
 
 EXPOSE 3000
 
@@ -33,4 +31,4 @@ CMD ["npm", "start"]
 # docker build -f .docker/awssam.node9.awscli.dockerfile -t awssam-node9-awscli .
 
 # Run
-# docker run --rm -p 3000:3000 -v $(PWD):/var/www awssam-node9-awscli
+# docker run --rm -p 3000:3000 -v $(PWD):/home/neo/app awssam-node9-awscli

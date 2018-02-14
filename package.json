@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "babel-node tools/build.js",
-    "start": "/home/node/.npm-global/bin/sam local start-api -t /home/node/app/sam.yml --host 0.0.0.0",
+    "start": "/home/neo/.npm-global/bin/sam local start-api -t /home/neo/app/sam.yml --host 0.0.0.0",
     "test": "test",
     "zip": "zip -r dist/handler.zip dist/bundle.js",
     "create-stack": "aws cloudformation create-stack --stack-name lambda-rest-starter-stack --template-body file://cicd-pipeline/pipeline.yml --parameters file://cicd-pipeline/pipeline-params.json --capabilities CAPABILITY_NAMED_IAM",
