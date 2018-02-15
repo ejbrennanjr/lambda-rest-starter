@@ -47,14 +47,6 @@ Resources:
         Version: '2012-10-17'
         Id: SSEAndSSLPolicy
         Statement:
-        - Sid: DenyUnEncryptedObjectUploads
-          Effect: Deny
-          Principal: "*"
-          Action: s3:PutObject
-          Resource: !Sub '${S3ArtifactBucket.Arn}/*'
-          Condition:
-            StringNotEquals:
-              s3:x-amz-server-side-encryption: aws:kms
         - Sid: DenyInsecureConnections
           Effect: Deny
           Principal: "*"
@@ -63,6 +55,21 @@ Resources:
           Condition:
             Bool:
               aws:SecureTransport: 'false'  
+        # Disabling this policy for now. CodeBuild buildspec hit an
+        # issue with this set.  aws cloudformation package call is made
+        # and fails with Access Denied error because of this policy.
+        # Think we need to create our own KMS key in the CFM template,
+        # then make that KMS key available as an Env Variable in the 
+        # CodeBuild container.  Then can specify that Env Variable on 
+        # the package call kms-key-id attribute.      
+        #- Sid: DenyUnEncryptedObjectUploads
+        #  Effect: Deny
+        #  Principal: "*"
+        #  Action: s3:PutObject
+        #  Resource: !Sub '${S3ArtifactBucket.Arn}/*'
+        #  Condition:
+        #    StringNotEquals:
+        #      s3:x-amz-server-side-encryption: aws:kms
 
 
   # --------------------------------------------------------------------------------------
@@ -106,11 +113,15 @@ Resources:
                 - kms:Decrypt
                 Effect: Allow
                 Resource: '*'                
-              - Action: ["s3:*"]
-                # - s3:PutObject
-                # - s3:GetObject
-                # - s3:GetObjectVersion
-                # - s3:ListBucket
+              - Action: 
+                - s3:PutObject
+                - s3:PutObjectAcl
+                - s3:PutObjectVersionAcl
+                - s3:GetObject
+                - s3:GetObjectAcl
+                - s3:GetObjectVersion
+                - s3:GetObjectVersionAcl
+                - s3:ListBucket
                 Effect: Allow
                 # Resource: 
                 # - arn:aws:s3:::codepipeline-us-east-1-*
@@ -341,7 +352,7 @@ Resources:
               RoleArn: !Sub '${CloudFormationIAMRole.Arn}'
               ChangeSetName: pipeline-changeset
               Capabilities: CAPABILITY_NAMED_IAM
-              TemplatePath: buildoutput::sam.yml
+              TemplatePath: buildoutput::post-sam.yml
               # TemplateConfiguration: buildoutput::lambda-params.json
             RunOrder: 1
           - Name: ExecuteChangeSet

@@ -8,9 +8,9 @@ phases:
       - npm install
       - npm run build
       - npm run zip
-      - ls
-      - ls dist
-      - aws cloudformation package --template sam.yml --kms-key-id arn:aws:kms:us-east-1:390894576276:key/ace0eb5a-2055-4e32-aeec-908239e7b6e3 --s3-bucket $S3_BUCKET --output-template post-sam.yml
+      # If bucket policy is DenyUnEncryptedObjectUploads, need to specify 
+      # a --kms-key-id attribute with Arn value
+      - aws cloudformation package --template sam.yml --s3-bucket $S3_BUCKET --output-template post-sam.yml
 artifacts:
   files:
     - dist/handler.zip
