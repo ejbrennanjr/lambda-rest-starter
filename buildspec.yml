@@ -10,7 +10,7 @@ phases:
       - npm run zip
       - ls
       - ls dist
-      - aws cloudformation package --template sam.yml --s3-bucket $S3_BUCKET --output-template post-sam.yml
+      - aws cloudformation package --template sam.yml --kms-key-id aws/s3 --s3-bucket $S3_BUCKET --output-template post-sam.yml
 artifacts:
   files:
     - dist/handler.zip

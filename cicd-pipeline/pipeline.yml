@@ -101,14 +101,21 @@ Resources:
                 Effect: Allow
                 Resource: '*'
               - Action:
-                - s3:PutObject
-                - s3:GetObject
-                - s3:GetObjectVersion
-                - s3:ListBucket
+                - kms:GenerateDataKey*
+                - kms:Encrypt
+                - kms:Decrypt
                 Effect: Allow
-                Resource: 
-                - arn:aws:s3:::codepipeline-us-east-1-*
-                - !Sub 'arn:aws:s3:::*'
+                Resource: '*'                
+              - Action: ["s3:*"]
+                # - s3:PutObject
+                # - s3:GetObject
+                # - s3:GetObjectVersion
+                # - s3:ListBucket
+                Effect: Allow
+                # Resource: 
+                # - arn:aws:s3:::codepipeline-us-east-1-*
+                # - !Sub 'arn:aws:s3:::*'
+                Resource: ["*"]
       RoleName: !Sub '${AppName}-codebuild-role-iam-${AWS::Region}'
   CodeBuildCompileLambda:
     DependsOn:
