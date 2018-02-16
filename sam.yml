@@ -9,7 +9,7 @@ Resources:
     Properties:
       Handler: index.handler
       Runtime: nodejs6.10
-      CodeUri: ./dist/handler.zip
+      CodeUri: ./dist/
       Events:
         ListFriends:
           Type: Api

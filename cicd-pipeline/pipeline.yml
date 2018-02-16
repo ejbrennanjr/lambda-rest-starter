@@ -61,7 +61,9 @@ Resources:
         # Think we need to create our own KMS key in the CFM template,
         # then make that KMS key available as an Env Variable in the 
         # CodeBuild container.  Then can specify that Env Variable on 
-        # the package call kms-key-id attribute.      
+        # the package call kms-key-id attribute.    
+        # https://medium.com/@jozeran/aws-sam-cloudformation-troubleshooting-for-lambda-deployments-60d8d3375635
+        # https://forums.aws.amazon.com/thread.jspa?messageID=794124  
         #- Sid: DenyUnEncryptedObjectUploads
         #  Effect: Deny
         #  Principal: "*"

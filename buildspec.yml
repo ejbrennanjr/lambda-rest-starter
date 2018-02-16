@@ -7,9 +7,11 @@ phases:
     commands:
       - npm install
       - npm run build
-      - npm run zip
+      # - npm run zip
       # If bucket policy is DenyUnEncryptedObjectUploads, need to specify 
       # a --kms-key-id attribute with Arn value
+      # https://medium.com/@jozeran/aws-sam-cloudformation-troubleshooting-for-lambda-deployments-60d8d3375635
+      # https://forums.aws.amazon.com/thread.jspa?messageID=794124
       - aws cloudformation package --template sam.yml --s3-bucket $S3_BUCKET --output-template post-sam.yml
 artifacts:
   files:
