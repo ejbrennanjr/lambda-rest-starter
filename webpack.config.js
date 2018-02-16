@@ -12,8 +12,7 @@ export default {
     entry: path.resolve(__dirname, 'index'),
     target: 'node',    
     plugins: [
-        new CleanWebpackPlugin(['dist']),
-        new UglifyJSPlugin()
+        new CleanWebpackPlugin(['dist'])
     ],  
     output: {
         filename: 'index.js',
