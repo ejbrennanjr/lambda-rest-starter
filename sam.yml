@@ -20,7 +20,7 @@ Parameters:
   PathToHandler: 
     Description: 'The path to index.js'
     Type: String 
-    Default: 'lambda-rest-starter'
+    Default: ''
     AllowedValues: 
       - ''
       - dist/
