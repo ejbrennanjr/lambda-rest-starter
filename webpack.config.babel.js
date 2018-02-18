@@ -7,24 +7,35 @@ const GLOBALS = {
     'process.env.NODE_ENV': JSON.stringify('production')
 };
 
+// https://github.com/webpack/webpack/issues/1403
+// https://github.com/webpack/webpack/issues/5960
+// http://www.romanfilippov.com/webpack-config-babel-js/
 export default {
+    context: __dirname,
     devtool: 'source-map',
-    entry: path.resolve(__dirname, 'index'),
+    entry: path.resolve(__dirname, 'src/index'),
     target: 'node',    
     plugins: [
         new CleanWebpackPlugin(['dist'])
     ],  
     output: {
         filename: 'index.js',
-        path: path.resolve(__dirname, 'dist')
+        path: path.resolve(__dirname, 'dist'),
+        library: "index",
+        libraryTarget: 'commonjs2'
     },
     module: {
         rules: [
           {
             test: /\.js$/,
             include: path.join(__dirname, 'src'),
-            use: 'babel-loader'
-          }
+            use: {
+                loader: 'babel-loader',
+                options: {
+                    babelrc: true
+                }
+            }
+          }     
         ]
     }    
 };

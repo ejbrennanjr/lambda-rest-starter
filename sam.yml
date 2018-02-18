@@ -2,14 +2,38 @@ AWSTemplateFormatVersion : '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Lambda Function - Friends API
 
+
+Parameters: 
+  AppName: 
+    Description: 'The name of the application'
+    Type: String 
+  FunctionName: 
+    Description: 'The name of the function'
+    Type: String 
+  # Link below, introduces a parameter-values parameter for the AWS-SAM-LOCAL cli commands.
+  # Using this parameter to distinguish between AWS CodePipeline use of this
+  # SAM file and the way AWS-SAM-LOCAL uses this SAM file.
+  # AWS SAM Local is using the index.js file in dist/ folder.  CodePipeline
+  # CloudFormation action will find the index.js in the root folder of the 
+  # packaged ZIP file
+  # https://github.com/awslabs/aws-sam-local/pull/123  
+  PathToHandler: 
+    Description: 'The path to index.js'
+    Type: String 
+    Default: 'lambda-rest-starter'
+    AllowedValues: 
+      - ''
+      - dist/
+
 Resources:
 
   Friends:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: index.handler
+      Handler: !Sub '${PathToHandler}index.handler'
       Runtime: nodejs6.10
       CodeUri: ./dist/
+      FunctionName: !Sub '${AppName}-${FunctionName}-lambda-${AWS::Region}'   
       Events:
         ListFriends:
           Type: Api

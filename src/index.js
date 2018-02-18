@@ -1,11 +1,11 @@
 'use strict';
 
 exports.handler = (event, context, callback) => {
-
+//export const handler = (event, context, callback) => {
     const database = [
         {
             id: "Augie-Chung",
-            name: "Augie Chung",
+            name: "Augie Chung3",
             categoryId: "friends"
         },
         {

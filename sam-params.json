@@ -1,0 +1,17 @@
+{
+  "Parameters" : {
+    "AppName" : "lambda-rest-starter",
+    "FunctionName" : "friends",
+    "PathToHandler" : ""
+  },
+  "StackPolicy" : {
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "NotAction" : "Update:Delete",
+        "Principal": "*",
+        "Resource" : "*"
+      }
+    ]
+  }
+}
