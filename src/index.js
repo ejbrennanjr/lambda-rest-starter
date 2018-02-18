@@ -5,7 +5,7 @@ exports.handler = (event, context, callback) => {
     const database = [
         {
             id: "Augie-Chung",
-            name: "Augie Chung3",
+            name: "Augie Chung",
             categoryId: "friends"
         },
         {
