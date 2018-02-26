@@ -4,6 +4,9 @@ Description: Lambda Function - Friends API
 
 
 Parameters: 
+  AppName: 
+    Description: 'The name of the application'
+    Type: String 
   DomainName:
     Description: Domain name for your website (example.com)
     Type: String
