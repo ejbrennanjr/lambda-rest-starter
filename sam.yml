@@ -18,6 +18,9 @@ Description: Lambda Function - Friends API
 # review comment from JBerges commented on Nov 14, 2017
 # https://github.com/serverless/serverless/issues/2233
 
+# Or this one...
+# https://github.com/awslabs/serverless-application-model/issues/192
+
 # Monitor this SAM Issue for a long term solution that incorporates BasePathMapping
 # into Native SAM rather than the need to bring in CloudFormation elements
 # https://github.com/awslabs/serverless-application-model/issues/248
