@@ -299,6 +299,7 @@ Resources:
   CodePipeline:
     Type: 'AWS::CodePipeline::Pipeline'
     Properties: 
+      Name: !Sub '${AppName}-lambda-codepipeline-${AWS::Region}'
       ArtifactStore:
         Location: !Ref S3ArtifactBucket
         Type: S3

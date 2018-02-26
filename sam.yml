@@ -4,9 +4,10 @@ Description: Lambda Function - Friends API
 
 
 Parameters: 
-  AppName: 
-    Description: 'The name of the application'
-    Type: String 
+  DomainName:
+    Description: Domain name for your website (example.com)
+    Type: String
+    Default: edbrennan.guru
   FunctionName: 
     Description: 'The name of the function'
     Type: String 
@@ -27,7 +28,29 @@ Parameters:
 
 Resources:
 
-  Friends:
+  FriendsApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      DefinitionBody:
+        swagger: 2.0
+        info:
+            title: !Sub "${AWS::StackName}-friends"
+        basePath: /friends
+        schemes: [https]
+        paths:
+          "/listFriends":
+            get:
+              produces: [application/json]
+              responses: 
+                description: 200 response
+              x-amazon-apigateway-integration:
+                httpMethod: POST # must be POST for lambda
+                type: aws_proxy
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FriendsFunction.Arn}/invocations'
+
+
+  FriendsFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: !Sub '${PathToHandler}index.handler'
@@ -38,15 +61,13 @@ Resources:
         ListFriends:
           Type: Api
           Properties:
-            Path: /friends
+            Path: /listFriends
             Method: get
-        CreateFriend:
-          Type: Api
-          Properties:
-            Path: /friends
-            Method: post
-        Friend:
-          Type: Api
-          Properties:
-            Path: /friends/{friend}
-            Method: any
+
+  BasePathMapping:
+    Type: 'AWS::ApiGateway::BasePathMapping'
+    Properties:
+      BasePath: friends
+      DomainName: !Ref DomainName
+      RestApiId: !Ref FriendsApi
+      Stage: prod
