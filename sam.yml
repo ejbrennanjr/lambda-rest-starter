@@ -65,6 +65,7 @@ Resources:
             Method: get
 
   BasePathMapping:
+    DependsOn: FriendsFunction
     Type: 'AWS::ApiGateway::BasePathMapping'
     Properties:
       BasePath: friends
