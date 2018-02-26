@@ -2,6 +2,22 @@ AWSTemplateFormatVersion : '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Lambda Function - Friends API
 
+# This link details the need for explictly creating AWS::Serverless::Api resource
+# and the AWS::ApiGateway::BasePathMapping.  There's a workaround in here that details
+# the need to add a DependsOn in the BasePathMapping on the creation of the function
+# to avoid a circular reference.
+# https://github.com/awslabs/serverless-application-model/issues/119
+
+# If confused by above, read this similiar thread from serverless framework and 
+# review comment from JBerges commented on Nov 14, 2017
+# https://github.com/serverless/serverless/issues/2233
+
+# Monitor this SAM Issue for a long term solution that incorporates BasePathMapping
+# into Native SAM rather than the need to bring in CloudFormation elements
+# https://github.com/awslabs/serverless-application-model/issues/248
+
+
+
 
 Parameters: 
   AppName: 
@@ -36,17 +52,21 @@ Resources:
     Properties:
       StageName: prod
       DefinitionBody:
-        swagger: 2.0
+        swagger: '2.0'
         info:
-            title: !Sub "${AWS::StackName}-friends"
+          version: '2016-08-18T18:08:34Z'
+          title: !Sub '${AWS::StackName}-friends'
         basePath: /friends
-        schemes: [https]
+        schemes:
+        - https
         paths:
-          "/listFriends":
+          '/listFriends':
             get:
-              produces: [application/json]
+              produces:
+              - application/json
               responses: 
-                description: 200 response
+                '200':
+                  description: '200 response'
               x-amazon-apigateway-integration:
                 httpMethod: POST # must be POST for lambda
                 type: aws_proxy
