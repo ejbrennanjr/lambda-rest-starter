@@ -95,6 +95,7 @@ Resources:
           Properties:
             Path: /
             Method: get
+            RestApiId: !Ref FriendsApi
 
   BasePathMapping:
     DependsOn: FriendsApiprodStage
