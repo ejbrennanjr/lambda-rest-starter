@@ -65,7 +65,7 @@ Resources:
         info:
           version: '2016-08-18T18:08:34Z'
           title: !Sub '${AWS::StackName}-friends'
-        basePath: /friends
+        #basePath: /friends
         schemes:
         - https
         paths:
