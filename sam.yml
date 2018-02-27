@@ -93,7 +93,7 @@ Resources:
         ListFriends:
           Type: Api
           Properties:
-            Path: /listFriends
+            Path: /
             Method: get
 
   BasePathMapping:
