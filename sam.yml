@@ -69,7 +69,7 @@ Resources:
         schemes:
         - https
         paths:
-          '/listFriends':
+          '/':
             get:
               produces:
               - application/json
