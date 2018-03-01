@@ -6,14 +6,17 @@ Resources:
     Type: "AWS::CloudFormation::Stack"
     Properties:
       Parameters: 
-        AppName: Fn::ImportValue:
-          Fn::Sub:
+        AppName: 
+          Fn::ImportValue:
+            Fn::Sub:
             - '${GlobalStackName}-AppName'
             - { GlobalStackName: !ImportValue GlobalStackName}
-        DomainName: Fn::ImportValue:
-          Fn::Sub:
+        DomainName: 
+          Fn::ImportValue:
+            Fn::Sub:
             - '${GlobalStackName}-DomainName'
-            - { GlobalStackName: !ImportValue GlobalStackName}
+            - GlobalStackName: !ImportValue GlobalStackName
         FunctionName: 'friends'
         PathToHandler: ''
       TemplateURL: ./post-sam.yml
+
