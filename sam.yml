@@ -81,7 +81,6 @@ Resources:
                 type: aws_proxy
                 uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FriendsFunction.Arn}/invocations'
 
-
   FriendsFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -101,7 +100,7 @@ Resources:
     DependsOn: FriendsApiprodStage
     Type: 'AWS::ApiGateway::BasePathMapping'
     Properties:
-      BasePath: friends
+      BasePath: !Ref FunctionName
       DomainName: !Ref DomainName
       RestApiId: !Ref FriendsApi
       Stage: prod

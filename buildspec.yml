@@ -13,11 +13,13 @@ phases:
       # https://medium.com/@jozeran/aws-sam-cloudformation-troubleshooting-for-lambda-deployments-60d8d3375635
       # https://forums.aws.amazon.com/thread.jspa?messageID=794124
       - aws cloudformation package --template sam.yml --s3-bucket $S3_BUCKET --output-template post-sam.yml
+      - aws cloudformation package --template sam-shell.cfm.yml --s3-bucket $S3_BUCKET --output-template post-sam-shell.cfm.yml
 artifacts:
   files:
     - dist/handler.zip
     # The sam.yml file is not part of the lambda function. 
     # It is needed for the CodePipeline Deploy step.  
     - post-sam.yml
+    - post-sam-shell.cfm.yml
     - sam-params.json  
   discard-paths: yes

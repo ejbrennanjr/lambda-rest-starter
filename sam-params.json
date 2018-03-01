@@ -1,7 +1,5 @@
 {
   "Parameters" : {
-    "AppName" : "lambda-rest-starter",
-    "DomainName" : "api.edbrennan.guru",
     "FunctionName" : "friends",
     "PathToHandler" : ""
   },

@@ -130,6 +130,8 @@ Resources:
                 # - !Sub 'arn:aws:s3:::*'
                 Resource: ["*"]
       RoleName: !Sub '${AppName}-codebuild-role-iam-${AWS::Region}'
+
+
   CodeBuildCompileLambda:
     DependsOn:
     - CodeBuildIAMRole  
@@ -296,6 +298,8 @@ Resources:
             Version: '2012-10-17'
       Path: '/'
       RoleName: !Sub '${AppName}-codepipeline-role-iam-${AWS::Region}'      
+
+
   CodePipeline:
     Type: 'AWS::CodePipeline::Pipeline'
     Properties: 
@@ -355,8 +359,8 @@ Resources:
               RoleArn: !Sub '${CloudFormationIAMRole.Arn}'
               ChangeSetName: pipeline-changeset
               Capabilities: CAPABILITY_NAMED_IAM
-              TemplatePath: buildoutput::post-sam.yml
-              TemplateConfiguration: buildoutput::sam-params.json
+              TemplatePath: buildoutput::post-sam-shell.cfm.yml
+              #TemplateConfiguration: buildoutput::sam-params.json
             RunOrder: 1
           - Name: ExecuteChangeSet
             InputArtifacts: []
@@ -371,6 +375,8 @@ Resources:
               ActionMode: CHANGE_SET_EXECUTE
               ChangeSetName: pipeline-changeset
             RunOrder: 2
+
+
 Outputs:
   S3ArtifactBucketArn:
     Value: !Sub '${S3ArtifactBucket.Arn}'
