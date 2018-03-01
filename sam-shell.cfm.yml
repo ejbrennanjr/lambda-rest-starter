@@ -1,21 +1,23 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
-Resources: 
- 
+
+Parameters:
+  GlobalStackName: 
+    Description: 'The name of stack which this stack depends on'
+    Type: String 
+    Default: 'react-lambda-starter-stack'
+
+Resources:  
   SAMStack:
-    Type: "AWS::CloudFormation::Stack"
+    Type: 'AWS::CloudFormation::Stack'
     Properties:
       Parameters: 
         AppName: 
           Fn::ImportValue:
-            Fn::Sub:
-            - '${GlobalStackName}-AppName'
-            - { GlobalStackName: !ImportValue GlobalStackName}
-        DomainName: 
+            !Sub '${GlobalStackName}-AppName'
+        DomainName:
           Fn::ImportValue:
-            Fn::Sub:
-            - '${GlobalStackName}-DomainName'
-            - GlobalStackName: !ImportValue GlobalStackName
+            !Sub '${GlobalStackName}-DomainName'
         FunctionName: 'friends'
         PathToHandler: ''
       TemplateURL: ./post-sam.yml
