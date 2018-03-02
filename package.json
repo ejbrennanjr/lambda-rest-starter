@@ -11,7 +11,8 @@
     "test": "test",
     "zip": "zip -r dist/handler.zip dist/bundle.js",
     "create-stack": "aws cloudformation create-stack --stack-name lambda-rest-starter-stack --template-body file://cicd-pipeline/pipeline.yml --parameters file://cicd-pipeline/pipeline-params.json --capabilities CAPABILITY_NAMED_IAM",
-    "delete-stack": "aws cloudformation delete-stack --stack-name lambda-rest-starter-stack"
+    "delete-stack": "aws cloudformation delete-stack --stack-name lambda-rest-starter-stack",
+    "validate-template": "aws cloudformation validate-template --template-body file://sam.yml"
   },
   "author": "EJB",
   "license": "MIT",

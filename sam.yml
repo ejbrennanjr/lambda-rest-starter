@@ -29,13 +29,9 @@ Description: Lambda Function - Friends API
 
 
 Parameters: 
-  AppName: 
-    Description: 'The name of the application'
-    Type: String 
   DomainName:
     Description: Domain name for your website (example.com)
     Type: String
-    Default: edbrennan.guru
   FunctionName: 
     Description: 'The name of the function'
     Type: String 
@@ -64,7 +60,10 @@ Resources:
         swagger: '2.0'
         info:
           version: '2016-08-18T18:08:34Z'
-          title: !Sub '${AWS::StackName}-friends'
+          title: 
+            !Sub
+              - '${AppName}-${FunctionName}-api-${AWS::Region}'
+              - AppName: !Join ['-', !Split [ '.', !Ref DomainName ]]
         #basePath: /friends
         schemes:
         - https
@@ -87,7 +86,11 @@ Resources:
       Handler: !Sub '${PathToHandler}index.handler'
       Runtime: nodejs6.10
       CodeUri: ./dist/
-      FunctionName: !Sub '${AppName}-${FunctionName}-lambda-${AWS::Region}'   
+      # FunctionName: !Sub '${AppName}-${FunctionName}-lambda-${AWS::Region}'   
+      FunctionName: 
+        !Sub
+          - '${AppName}-${FunctionName}-lambda-${AWS::Region}'
+          - AppName: !Join ['-', !Split [ '.', !Ref DomainName ]]
       Events:
         ListFriends:
           Type: Api
@@ -98,7 +101,7 @@ Resources:
 
   BasePathMapping:
     DependsOn: FriendsApiprodStage
-    Type: 'AWS::ApiGateway::BasePathMapping'
+    Type: AWS::ApiGateway::BasePathMapping
     Properties:
       BasePath: !Ref FunctionName
       DomainName: !Ref DomainName
