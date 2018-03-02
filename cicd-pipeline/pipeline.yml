@@ -359,8 +359,8 @@ Resources:
               RoleArn: !Sub '${CloudFormationIAMRole.Arn}'
               ChangeSetName: pipeline-changeset
               Capabilities: CAPABILITY_NAMED_IAM
-              TemplatePath: buildoutput::post-sam-shell.cfm.yml
-              #TemplateConfiguration: buildoutput::sam-params.json
+              TemplatePath: buildoutput::post-sam.yml
+              TemplateConfiguration: buildoutput::sam-params.json
             RunOrder: 1
           - Name: ExecuteChangeSet
             InputArtifacts: []
