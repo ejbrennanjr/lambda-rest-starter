@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion : '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Lambda Function - Friends API
+Description: Serverless - Friends API
 
 # Swagger implementation Example
 # https://blog.jayway.com/2016/09/18/introduction-swagger-cloudformation-api-gateway/
@@ -32,9 +32,6 @@ Parameters:
   DomainName:
     Description: Domain name for your website (example.com)
     Type: String
-  FunctionName: 
-    Description: 'The name of the function'
-    Type: String 
   # Link below, introduces a parameter-values parameter for the AWS-SAM-LOCAL cli commands.
   # Using this parameter to distinguish between AWS CodePipeline use of this
   # SAM file and the way AWS-SAM-LOCAL uses this SAM file.
@@ -60,10 +57,9 @@ Resources:
         swagger: '2.0'
         info:
           version: '2016-08-18T18:08:34Z'
-          title: 
-            !Sub
-              - '${AppName}-${FunctionName}-api-${AWS::Region}'
-              - AppName: !Join ['-', !Split [ '.', !Ref DomainName ]]
+          title: !Sub 
+            - '${AWS::StackName}--apig-${NoSpaceRegion}'
+            - NoSpaceRegion: !Join ['', !Split ['-', ${AWS::Region}]]
         #basePath: /friends
         schemes:
         - https
@@ -85,12 +81,10 @@ Resources:
     Properties:
       Handler: !Sub '${PathToHandler}index.handler'
       Runtime: nodejs6.10
-      CodeUri: ./dist/
-      # FunctionName: !Sub '${AppName}-${FunctionName}-lambda-${AWS::Region}'   
-      FunctionName: 
-        !Sub
-          - '${AppName}-${FunctionName}-lambda-${AWS::Region}'
-          - AppName: !Join ['-', !Split [ '.', !Ref DomainName ]]
+      CodeUri: ./dist/ 
+      FunctionName: !Sub 
+        - '${AWS::StackName}--lambda-${NoSpaceRegion}'
+        - NoSpaceRegion: !Join ['', !Split ['-', ${AWS::Region}]]
       Events:
         ListFriends:
           Type: Api
@@ -99,11 +93,23 @@ Resources:
             Method: get
             RestApiId: !Ref FriendsApi
 
+
   BasePathMapping:
     DependsOn: FriendsApiprodStage
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
-      BasePath: !Ref FunctionName
+      BasePath: !Sub 
+        - '${FunctionName}'
+        - FunctionName: !Select [4, !Split ['-', ${AWS::StackName}]]
       DomainName: !Ref DomainName
       RestApiId: !Ref FriendsApi
       Stage: prod
+
+
+Outputs:
+  StackName:
+    Value: !Sub '${AWS::StackName}'
+  FriendsFunctionArn:
+    Value: !GetAtt FriendsFunction.Arn
+
+  

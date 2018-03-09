@@ -1,7 +1,6 @@
 {
   "Parameters" : {
     "DomainName" : "edbrennan.guru",
-    "FunctionName" : "friends",
     "PathToHandler" : ""
   },
   "StackPolicy" : {

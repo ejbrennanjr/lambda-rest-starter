@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'Continuous Delivery Pipeline'
-Parameters:
+Parameters: 
   GitHubUser: 
     Description: 'The user of the GitHub repository, must have access to the GitHubToken'
     Type: String
@@ -30,9 +30,7 @@ Resources:
     Description: 'S3 Bucket for storing build artifacts'
     Type: 'AWS::S3::Bucket'
     Properties: 
-      BucketName: !Sub 
-        - '${AWS::StackName}-buildartifacts-s3-${NoSpaceRegion}'
-        - NoSpaceRegion: !Join ['', !Split ['-', ${AWS::Region}]]
+      BucketName: !Sub '${AWS::StackName}-build-s3-${AWS::Region}'      
       VersioningConfiguration:
         Status: Enabled
   S3ArtifactBucketPolicy:
@@ -98,7 +96,7 @@ Resources:
           - sts:AssumeRole
       Path: /
       Policies:
-        - PolicyName: !Sub '${AWS::StackName}-cbuild-policy-iam'
+        - PolicyName: !Sub '${AWS::StackName}-codebuild-policy-iam-${AWS::Region}'
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -128,7 +126,7 @@ Resources:
                 # - arn:aws:s3:::codepipeline-us-east-1-*
                 # - !Sub 'arn:aws:s3:::*'
                 Resource: ["*"]
-      RoleName: !Sub '${AWS::StackName}-cbuild-role-iam'
+      RoleName: !Sub '${AWS::StackName}-codebuild-role-iam-${AWS::Region}'
 
 
   CodeBuildCompileLambda:
@@ -146,9 +144,7 @@ Resources:
         EnvironmentVariables:
           - Name: S3_BUCKET
             Value: !Ref S3ArtifactBucket
-      Name: !Sub 
-        - '${AWS::StackName}-compile-cbuild-${NoSpaceRegion}'
-        - NoSpaceRegion: !Join ['', !Split ['-', ${AWS::Region}]]
+      Name: !Sub '${AWS::StackName}-compilelambda-codebuild-${AWS::Region}'
       ServiceRole: !Sub '${CodeBuildIAMRole.Arn}'
       Source:
         BuildSpec: buildspec.yml
@@ -175,7 +171,7 @@ Resources:
           Action: sts:AssumeRole
       Path: /
       Policies:
-        - PolicyName: !Sub '${AWS::StackName}-cform-policy-iam'
+        - PolicyName: !Sub '${AWS::StackName}-cloudformation-policy-iam-${AWS::Region}'
           PolicyDocument:
             Statement:
             - Action: ["s3:*"]
@@ -199,7 +195,7 @@ Resources:
             - Action: ["cloudformation:CreateChangeSet"]
               Resource: !Sub "arn:aws:cloudformation:${AWS::Region}:aws:transform/Serverless-2016-10-31"
               Effect: Allow
-      RoleName: !Sub '${AWS::StackName}-cform-role-iam'      
+      RoleName: !Sub '${AWS::StackName}-cloudformation-role-iam-${AWS::Region}'      
 
 
 
@@ -229,7 +225,7 @@ Resources:
             - 'sts:AssumeRole'
       Policies:
         # https://docs.aws.amazon.com/codepipeline/latest/userguide/how-to-custom-role.html
-        - PolicyName: !Sub '${AWS::StackName}-cpipe-policy-iam'
+        - PolicyName: !Sub '${AWS::StackName}-codepipeline-policy-iam-${AWS::Region}'
           PolicyDocument:
             Statement:
             - Action:
@@ -298,15 +294,13 @@ Resources:
               Effect: Allow
             Version: '2012-10-17'
       Path: '/'
-      RoleName: !Sub '${AWS::StackName}-cpipe-role-iam'      
+      RoleName: !Sub '${AWS::StackName}-codepipeline-role-iam-${AWS::Region}'      
 
 
   CodePipeline:
     Type: 'AWS::CodePipeline::Pipeline'
     Properties: 
-      Name: !Sub 
-        - '${AWS::StackName}-cpipe-${NoSpaceRegion}'
-        - NoSpaceRegion: !Join ['', !Split ['-', ${AWS::Region}]]
+      Name: !Sub '${AWS::StackName}-lambda-codepipeline-${AWS::Region}'
       ArtifactStore:
         Location: !Ref S3ArtifactBucket
         Type: S3
@@ -342,9 +336,7 @@ Resources:
             OutputArtifacts:
             - Name: buildoutput
             Configuration:
-              ProjectName: !Sub 
-                - '${AWS::StackName}-compile-cbuild-${NoSpaceRegion}'
-                - NoSpaceRegion: !Join ['', !Split ['-', ${AWS::Region}]]
+              ProjectName: !Sub '${AWS::StackName}-compilelambda-codebuild-${AWS::Region}'
             RunOrder: 1
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/continuous-delivery-codepipeline-action-reference.html    
         - Name: Deploy
@@ -359,11 +351,7 @@ Resources:
               Provider: CloudFormation
             OutputArtifacts: []
             Configuration:
-              StackName: !Sub 
-                - '${AppName}-api-${FunctionName}-${Instance}'
-                - AppName: !Select [0, !Split ['-', ${AWS::StackName}]]
-                  FunctionName: !Select [2, !Split ['-', ${AWS::StackName}]]
-                  Instance: !Select [3, !Split ['-', ${AWS::StackName}]]
+              StackName: !Sub "${AWS::StackName}-lambda-cloudformation-${AWS::Region}"
               ActionMode: CHANGE_SET_REPLACE
               RoleArn: !Sub '${CloudFormationIAMRole.Arn}'
               ChangeSetName: pipeline-changeset
@@ -380,11 +368,7 @@ Resources:
               Provider: CloudFormation
             OutputArtifacts: []
             Configuration:
-              StackName: !Sub 
-                - '${AppName}-api-${FunctionName}-${Instance}'
-                - AppName: !Select [0, !Split ['-', ${AWS::StackName}]]
-                  FunctionName: !Select [2, !Split ['-', ${AWS::StackName}]]
-                  Instance: !Select [3, !Split ['-', ${AWS::StackName}]]
+              StackName: !Sub "${AWS::StackName}-lambda-cloudformation-${AWS::Region}"
               ActionMode: CHANGE_SET_EXECUTE
               ChangeSetName: pipeline-changeset
             RunOrder: 2
