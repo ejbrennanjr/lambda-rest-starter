@@ -27,7 +27,7 @@ exports.handler = (event, context, callback) => {
             const response = {
                 statusCode: 200,
                 headers: {
-                    "Access-Control-Allow-Origin" : "https://api.edbrennan.guru",
+                    "Access-Control-Allow-Origin" : "https://edbrennan.guru",
                     "Access-Control-Allow-Credentials" : "true",
                     "Vary": "Origin"
                 },
