@@ -17,7 +17,7 @@
   "author": "EJB",
   "license": "MIT",
   "devDependencies": {
-    "aws-sam-local": "^0.2.6",
+    "aws-sam-local": "^doc",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",

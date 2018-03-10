@@ -57,9 +57,9 @@ Resources:
         swagger: '2.0'
         info:
           version: '2016-08-18T18:08:34Z'
-          title: !Sub 
+          title: !Sub
             - '${AWS::StackName}--apig-${NoSpaceRegion}'
-            - NoSpaceRegion: !Join ['', !Split ['-', ${AWS::Region}]]
+            - NoSpaceRegion: !Join ['', !Split ['-', !Ref 'AWS::Region']]
         #basePath: /friends
         schemes:
         - https
@@ -84,7 +84,7 @@ Resources:
       CodeUri: ./dist/ 
       FunctionName: !Sub 
         - '${AWS::StackName}--lambda-${NoSpaceRegion}'
-        - NoSpaceRegion: !Join ['', !Split ['-', ${AWS::Region}]]
+        - NoSpaceRegion: !Join ['', !Split ['-', !Ref 'AWS::Region']]
       Events:
         ListFriends:
           Type: Api
@@ -100,7 +100,7 @@ Resources:
     Properties:
       BasePath: !Sub 
         - '${FunctionName}'
-        - FunctionName: !Select [4, !Split ['-', ${AWS::StackName}]]
+        - FunctionName: !Select [4, !Split ['-', !Ref 'AWS::StackName']]
       DomainName: !Ref DomainName
       RestApiId: !Ref FriendsApi
       Stage: prod

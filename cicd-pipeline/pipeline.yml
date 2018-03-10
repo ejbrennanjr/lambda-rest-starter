@@ -32,7 +32,7 @@ Resources:
     Properties: 
       BucketName: !Sub 
         - '${AWS::StackName}-buildartifacts-s3-${NoSpaceRegion}'
-        - NoSpaceRegion: !Join ['', !Split ['-', ${AWS::Region}]]
+        - NoSpaceRegion: !Join ['', !Split ['-', !Ref 'AWS::Region']]
       VersioningConfiguration:
         Status: Enabled
   S3ArtifactBucketPolicy:
@@ -148,7 +148,7 @@ Resources:
             Value: !Ref S3ArtifactBucket
       Name: !Sub 
         - '${AWS::StackName}-compile-cbuild-${NoSpaceRegion}'
-        - NoSpaceRegion: !Join ['', !Split ['-', ${AWS::Region}]]
+        - NoSpaceRegion: !Join ['', !Split ['-', !Ref 'AWS::Region']]
       ServiceRole: !Sub '${CodeBuildIAMRole.Arn}'
       Source:
         BuildSpec: buildspec.yml
@@ -306,7 +306,7 @@ Resources:
     Properties: 
       Name: !Sub 
         - '${AWS::StackName}-cpipe-${NoSpaceRegion}'
-        - NoSpaceRegion: !Join ['', !Split ['-', ${AWS::Region}]]
+        - NoSpaceRegion: !Join ['', !Split ['-', !Ref 'AWS::Region']]
       ArtifactStore:
         Location: !Ref S3ArtifactBucket
         Type: S3
@@ -344,7 +344,7 @@ Resources:
             Configuration:
               ProjectName: !Sub 
                 - '${AWS::StackName}-compile-cbuild-${NoSpaceRegion}'
-                - NoSpaceRegion: !Join ['', !Split ['-', ${AWS::Region}]]
+                - NoSpaceRegion: !Join ['', !Split ['-', !Ref 'AWS::Region']]
             RunOrder: 1
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/continuous-delivery-codepipeline-action-reference.html    
         - Name: Deploy
@@ -361,9 +361,9 @@ Resources:
             Configuration:
               StackName: !Sub 
                 - '${AppName}-api-${FunctionName}-${Instance}'
-                - AppName: !Select [0, !Split ['-', ${AWS::StackName}]]
-                  FunctionName: !Select [2, !Split ['-', ${AWS::StackName}]]
-                  Instance: !Select [3, !Split ['-', ${AWS::StackName}]]
+                - AppName: !Select [0, !Split ['-', !Ref 'AWS::StackName']]
+                  FunctionName: !Select [2, !Split ['-', !Ref 'AWS::StackName']]
+                  Instance: !Select [3, !Split ['-', !Ref 'AWS::StackName']]
               ActionMode: CHANGE_SET_REPLACE
               RoleArn: !Sub '${CloudFormationIAMRole.Arn}'
               ChangeSetName: pipeline-changeset
@@ -382,9 +382,9 @@ Resources:
             Configuration:
               StackName: !Sub 
                 - '${AppName}-api-${FunctionName}-${Instance}'
-                - AppName: !Select [0, !Split ['-', ${AWS::StackName}]]
-                  FunctionName: !Select [2, !Split ['-', ${AWS::StackName}]]
-                  Instance: !Select [3, !Split ['-', ${AWS::StackName}]]
+                - AppName: !Select [0, !Split ['-', !Ref 'AWS::StackName']]
+                  FunctionName: !Select [2, !Split ['-', !Ref 'AWS::StackName']]
+                  Instance: !Select [3, !Split ['-', !Ref 'AWS::StackName']]
               ActionMode: CHANGE_SET_EXECUTE
               ChangeSetName: pipeline-changeset
             RunOrder: 2
