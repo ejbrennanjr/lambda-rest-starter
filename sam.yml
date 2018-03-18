@@ -54,13 +54,13 @@ Parameters:
     AllowedValues: 
       - '/'
       - '/friends'   
-  Environment:
-    Description: AWS or AWS-SAM-LOCAL
-    Type: String
-    Default: 'AWS'
-    AllowedValues: 
-      - 'AWS'
-      - 'AWS-SAM-LOCAL'      
+  # Environment:
+  #   Description: AWS or AWS-SAM-LOCAL
+  #   Type: String
+  #   Default: 'AWS'
+  #   AllowedValues: 
+  #     - 'AWS'
+  #     - 'AWS-SAM-LOCAL'      
 
 #Conditions:
 #  IsAWS: !Equals [!Ref Environment, AWS]
