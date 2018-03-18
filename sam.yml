@@ -54,6 +54,9 @@ Parameters:
       - 'AWS'
       - 'AWS-SAM-LOCAL'        
 
+Conditions:
+  IsAWS: !Equals [!Ref Environment, 'AWS']
+
 Resources:
 
   FriendsApi:
