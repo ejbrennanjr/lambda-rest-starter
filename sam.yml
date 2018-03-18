@@ -76,10 +76,9 @@ Resources:
         swagger: '2.0'
         info:
           version: '2016-08-18T18:08:34Z'
-          title:
-            Fn::Sub: # Had to use Fn::Sub because of this link...https://github.com/awslabs/aws-sam-local/issues/135
-              - '${AWS::StackName}--apig-${NoSpaceRegion}'
-              - NoSpaceRegion: !Join ['', !Split ['-', !Ref 'AWS::Region']]
+          title: !Sub # Had to use Fn::Sub because of this link...https://github.com/awslabs/aws-sam-local/issues/135
+            - '${AWS::StackName}--apig-${NoSpaceRegion}'
+            - NoSpaceRegion: !Join ['', !Split ['-', !Ref 'AWS::Region']]
         #basePath: /friends
         schemes:
         - https
@@ -102,10 +101,9 @@ Resources:
       Handler: !Sub '${PathToHandler}index.handler'
       Runtime: nodejs6.10
       CodeUri: ./dist/ 
-      FunctionName: 
-        Fn::Sub: # Had to use Fn::Sub because of this link...https://github.com/awslabs/aws-sam-local/issues/135
-          - '${AWS::StackName}--lambda-${NoSpaceRegion}'
-          - NoSpaceRegion: !Join ['', !Split ['-', !Ref 'AWS::Region']]
+      FunctionName: !Sub # Had to use Fn::Sub because of this link...https://github.com/awslabs/aws-sam-local/issues/135
+        - '${AWS::StackName}--lambda-${NoSpaceRegion}'
+        - NoSpaceRegion: !Join ['', !Split ['-', !Ref 'AWS::Region']]
       Events:
         ListFriends:
           Type: Api
@@ -121,10 +119,9 @@ Resources:
     Type: AWS::ApiGateway::BasePathMapping
     #Condition: IsAWS
     Properties:
-      BasePath:
-        Fn::Sub: # Had to use Fn::Sub because of this link...https://github.com/awslabs/aws-sam-local/issues/135
-          - '${FunctionName}'
-          - FunctionName: !Select [2, !Split ['-', !Ref 'AWS::StackName']]
+      BasePath: !Sub # Had to use Fn::Sub because of this link...https://github.com/awslabs/aws-sam-local/issues/135
+        - '${FunctionName}'
+        - FunctionName: !Select [2, !Split ['-', !Ref 'AWS::StackName']]
       DomainName: !Ref DomainName
       RestApiId: !Ref FriendsApi
       Stage: prod
@@ -135,7 +132,7 @@ Resources:
   #   Type: AWS::DynamoDB::Table
   #   Properties:
   #     TableName: 
-  #       Fn::Sub: # Had to use Fn::Sub because of this link...https://github.com/awslabs/aws-sam-local/issues/135
+  #       !Sub # Had to use Fn::Sub because of this link...https://github.com/awslabs/aws-sam-local/issues/135
   #         - '${SchemaName}.${FunctionName}'
   #         - SchemaName: !Select [0, !Split ['-', !Ref 'AWS::StackName']]
   #           FunctionName: !Select [2, !Split ['-', !Ref 'AWS::StackName']]
