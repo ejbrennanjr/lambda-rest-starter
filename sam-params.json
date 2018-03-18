@@ -1,8 +1,7 @@
 {
   "Parameters" : {
-    "DomainName" : "api.edbrennan.guru",
-    "PathToHandler" : "",
-    "PathToAPI" : "/"
+    "DomainName" : "edbrennan.guru",
+    "PathToHandler" : ""
   },
   "StackPolicy" : {
     "Statement" : [
