@@ -46,6 +46,13 @@ Parameters:
     AllowedValues: 
       - ''
       - dist/
+  Environment:
+    Description: 'AWS or AWS-SAM-LOCAL'
+    Type: String
+    Default: 'AWS'
+    AllowedValues: 
+      - 'AWS'
+      - 'AWS-SAM-LOCAL'        
 
 Resources:
 
