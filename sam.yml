@@ -32,6 +32,7 @@ Parameters:
   DomainName:
     Description: Domain name for your website (example.com)
     Type: String
+
   # Link below, introduces a parameter-values parameter for the AWS-SAM-LOCAL cli commands.
   # Using this parameter to distinguish between AWS CodePipeline use of this
   # SAM file and the way AWS-SAM-LOCAL uses this SAM file.
@@ -46,20 +47,40 @@ Parameters:
     AllowedValues: 
       - ''
       - dist/
+  PathToAPI:
+    Description: 'The path to the API for API Gateway'
+    Type: String 
+    Default: '/'
+    AllowedValues: 
+      - '/'
+      - '/friends'   
+
+  Environment:
+    Description: AWS or AWS-SAM-LOCAL
+    Type: String
+    Default: 'AWS'
+    AllowedValues: 
+      - 'AWS'
+      - 'AWS-SAM-LOCAL'      
+
+Conditions:
+  IsAWS: !Equals [!Ref Environment, AWS]
 
 Resources:
 
   FriendsApi:
     Type: AWS::Serverless::Api
+    Condition: IsAWS
     Properties:
       StageName: prod
       DefinitionBody:
         swagger: '2.0'
         info:
           version: '2016-08-18T18:08:34Z'
-          title: !Sub
-            - '${AWS::StackName}--apig-${NoSpaceRegion}'
-            - NoSpaceRegion: !Join ['', !Split ['-', !Ref 'AWS::Region']]
+          title:
+            Fn::Sub: # Had to use Fn::Sub because of this link...https://github.com/awslabs/aws-sam-local/issues/135
+              - '${AWS::StackName}--apig-${NoSpaceRegion}'
+              - NoSpaceRegion: !Join ['', !Split ['-', !Ref 'AWS::Region']]
         #basePath: /friends
         schemes:
         - https
@@ -82,14 +103,16 @@ Resources:
       Handler: !Sub '${PathToHandler}index.handler'
       Runtime: nodejs6.10
       CodeUri: ./dist/ 
-      FunctionName: !Sub 
-        - '${AWS::StackName}--lambda-${NoSpaceRegion}'
-        - NoSpaceRegion: !Join ['', !Split ['-', !Ref 'AWS::Region']]
+      FunctionName: 
+        Fn::Sub: # Had to use Fn::Sub because of this link...https://github.com/awslabs/aws-sam-local/issues/135
+          - '${AWS::StackName}--lambda-${NoSpaceRegion}'
+          - NoSpaceRegion: !Join ['', !Split ['-', !Ref 'AWS::Region']]
       Events:
         ListFriends:
           Type: Api
           Properties:
-            Path: /
+            Path: !Ref PathToAPI
+            #Path: !Sub '${PathToAPI}'
             Method: get
             RestApiId: !Ref FriendsApi
 
@@ -97,13 +120,35 @@ Resources:
   BasePathMapping:
     DependsOn: FriendsApiprodStage
     Type: AWS::ApiGateway::BasePathMapping
+    Condition: IsAWS
     Properties:
-      BasePath: !Sub 
-        - '${FunctionName}'
-        - FunctionName: !Select [2, !Split ['-', !Ref 'AWS::StackName']]
+      BasePath:
+        Fn::Sub: # Had to use Fn::Sub because of this link...https://github.com/awslabs/aws-sam-local/issues/135
+          - '${FunctionName}'
+          - FunctionName: !Select [2, !Split ['-', !Ref 'AWS::StackName']]
       DomainName: !Ref DomainName
       RestApiId: !Ref FriendsApi
       Stage: prod
+
+
+
+  FriendsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: 
+        Fn::Sub: # Had to use Fn::Sub because of this link...https://github.com/awslabs/aws-sam-local/issues/135
+          - '${SchemaName}.${FunctionName}'
+          - SchemaName: !Select [0, !Split ['-', !Ref 'AWS::StackName']]
+            FunctionName: !Select [2, !Split ['-', !Ref 'AWS::StackName']]
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      KeySchema:
+        - AttributeName: FriendId
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: FriendId
+          AttributeType: S
 
 
 Outputs:

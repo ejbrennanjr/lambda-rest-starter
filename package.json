@@ -6,8 +6,8 @@
   "scripts": {
     "build": "babel-node tools/build.js",
     "start": "npm-run-all --parallel start:watch start:samlocal",
-    "start:samlocal": "/home/neo/.npm-global/bin/sam local start-api -t /home/neo/app/sam.yml --host 0.0.0.0 --parameter-values ParameterKey=PathToHandler,ParameterValue=dist/",
-    "start:watch": "webpack --watch",
+    "start:samlocal": "/home/neo/.npm-global/bin/sam local start-api -t /home/neo/app/sam.yml --host 0.0.0.0 --parameter-values 'ParameterKey=DomainName,ParameterValue=api.edbrennan.guru ParameterKey=PathToHandler,ParameterValue=dist/ ParameterKey=PathToAPI,ParameterValue=/friends ParameterKey=Environment,ParameterValue=AWS-SAM-LOCAL'",
+    "start:watch": "webpack --config webpack.config.dev.babel.js --watch",
     "test": "test",
     "zip": "zip -r dist/handler.zip dist/bundle.js",
     "create-stack": "aws cloudformation create-stack --stack-name edbrennanguru-cid-friends-001  --template-body file://cicd-pipeline/pipeline.yml --parameters file://cicd-pipeline/pipeline-params.json --capabilities CAPABILITY_NAMED_IAM",

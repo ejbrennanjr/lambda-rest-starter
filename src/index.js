@@ -1,7 +1,16 @@
 'use strict';
+var AWS = require('aws-sdk');
+
+
 
 exports.handler = (event, context, callback) => {
-//export const handler = (event, context, callback) => {
+
+    AWS.config.update({region: 'us-east-1'});
+    var dynamodb = new AWS.DynamoDB();
+
+
+
+
     const database = [
         {
             id: "Augie-Chung",
@@ -20,23 +29,51 @@ exports.handler = (event, context, callback) => {
         },  
     ];
     
+    const allowOrigin = process.env.NODE_ENV === 'production' ? 'https://edbrennan.guru'
+                                                              : 'http://localhost:3000';
+
+
     switch(event.httpMethod){
 
         case "GET":
-            //https://stackoverflow.com/questions/31911898/configure-cors-response-headers-on-aws-lambda
-            const response = {
-                statusCode: 200,
-                headers: {
-                    "Access-Control-Allow-Origin" : "https://edbrennan.guru",
-                    "Access-Control-Allow-Credentials" : "true",
-                    "Vary": "Origin"
-                },
-                body: JSON.stringify(database),
-              };
 
+            var params = {
+                TableName: 'ebrennanguru.friends',
+                ReturnConsumedCapacity: 'TOTAL'
+            };
 
-            callback(null, response);
-            break;
+            dynamodb.scan(params).promise()
+            .then((items) => {
+                //https://stackoverflow.com/questions/31911898/configure-cors-response-headers-on-aws-lambda
+                const response = {
+                    statusCode: 200,
+                    headers: {
+                        "Access-Control-Allow-Origin" : allowOrigin,
+                        "Access-Control-Allow-Credentials" : "true",
+                        "Vary": "Origin"
+                    },
+                    body: JSON.stringify(items)
+                  };
+
+                callback(null, response);
+
+            })
+            .catch((error) => {
+
+                const response = {
+                    statusCode: 400,
+                    headers: {
+                        "Access-Control-Allow-Origin" : allowOrigin,
+                        "Access-Control-Allow-Credentials" : "true",
+                        "Vary": "Origin"
+                    },
+                    body: JSON.stringify(error)
+                }
+
+                callback(null, response);
+            })                
+        
+                break;
 
         case "POST":            
             callback(null, {body: "This is a CREATE operation"}); 
@@ -52,15 +89,17 @@ exports.handler = (event, context, callback) => {
 
         default:
 
-        const errorResponse = {
-            statusCode: 400,
-            headers: {
-              "x-custom-header" : "my custom header value"
-            },
-            body: JSON.stringify({
-              message: 'Bad request Dude',
-            }),
-          };
+            const errorResponse = {
+                statusCode: 400,
+                headers: {
+                    "Access-Control-Allow-Origin" : allowOrigin,
+                    "Access-Control-Allow-Credentials" : "true",
+                    "Vary": "Origin"
+                },
+                body: JSON.stringify({
+                    message: 'Bad request Dude',
+                }),
+            };
 
             // Send HTTP 501: Not Implemented
             console.log("Error: unsupported HTTP method (" + event.httpMethod + ")");
