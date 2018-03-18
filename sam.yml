@@ -61,6 +61,7 @@ Resources:
 
   FriendsApi:
     Type: AWS::Serverless::Api
+    Condition: IsAWS
     Properties:
       StageName: prod
       DefinitionBody:
@@ -107,6 +108,7 @@ Resources:
   BasePathMapping:
     DependsOn: FriendsApiprodStage
     Type: AWS::ApiGateway::BasePathMapping
+    Condition: IsAWS    
     Properties:
       BasePath: !Sub 
         - '${FunctionName}'
