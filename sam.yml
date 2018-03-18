@@ -54,7 +54,6 @@ Parameters:
     AllowedValues: 
       - '/'
       - '/friends'   
-
   Environment:
     Description: AWS or AWS-SAM-LOCAL
     Type: String
@@ -63,14 +62,14 @@ Parameters:
       - 'AWS'
       - 'AWS-SAM-LOCAL'      
 
-Conditions:
-  IsAWS: !Equals [!Ref Environment, AWS]
+#Conditions:
+#  IsAWS: !Equals [!Ref Environment, AWS]
 
 Resources:
 
   FriendsApi:
     Type: AWS::Serverless::Api
-    Condition: IsAWS
+    #Condition: IsAWS
     Properties:
       StageName: prod
       DefinitionBody:
@@ -120,7 +119,7 @@ Resources:
   BasePathMapping:
     DependsOn: FriendsApiprodStage
     Type: AWS::ApiGateway::BasePathMapping
-    Condition: IsAWS
+    #Condition: IsAWS
     Properties:
       BasePath:
         Fn::Sub: # Had to use Fn::Sub because of this link...https://github.com/awslabs/aws-sam-local/issues/135
