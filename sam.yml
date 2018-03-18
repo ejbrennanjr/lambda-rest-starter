@@ -132,23 +132,23 @@ Resources:
 
 
 
-  FriendsTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: 
-        Fn::Sub: # Had to use Fn::Sub because of this link...https://github.com/awslabs/aws-sam-local/issues/135
-          - '${SchemaName}.${FunctionName}'
-          - SchemaName: !Select [0, !Split ['-', !Ref 'AWS::StackName']]
-            FunctionName: !Select [2, !Split ['-', !Ref 'AWS::StackName']]
-      ProvisionedThroughput:
-        ReadCapacityUnits: 1
-        WriteCapacityUnits: 1
-      KeySchema:
-        - AttributeName: FriendId
-          KeyType: HASH
-      AttributeDefinitions:
-        - AttributeName: FriendId
-          AttributeType: S
+  # FriendsTable:
+  #   Type: AWS::DynamoDB::Table
+  #   Properties:
+  #     TableName: 
+  #       Fn::Sub: # Had to use Fn::Sub because of this link...https://github.com/awslabs/aws-sam-local/issues/135
+  #         - '${SchemaName}.${FunctionName}'
+  #         - SchemaName: !Select [0, !Split ['-', !Ref 'AWS::StackName']]
+  #           FunctionName: !Select [2, !Split ['-', !Ref 'AWS::StackName']]
+  #     ProvisionedThroughput:
+  #       ReadCapacityUnits: 1
+  #       WriteCapacityUnits: 1
+  #     KeySchema:
+  #       - AttributeName: FriendId
+  #         KeyType: HASH
+  #     AttributeDefinitions:
+  #       - AttributeName: FriendId
+  #         AttributeType: S
 
 
 Outputs:
