@@ -180,7 +180,14 @@ Resources:
             Statement:
             - Action: ["s3:*"]
               Resource: "*"
-              Effect: Allow          
+              Effect: Allow
+            - Action: ["dynamodb:*"]
+              Resource: 
+                !Sub 
+                  - 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${SchemaName}.${FunctionName}'
+                  - SchemaName: !Select [0, !Split ['-', !Ref 'AWS::StackName']]
+                    FunctionName: !Select [2, !Split ['-', !Ref 'AWS::StackName']]
+              Effect: Allow                         
             - Action: ["lambda:*"]
               Resource: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:*"
               Effect: Allow
