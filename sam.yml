@@ -32,6 +32,20 @@ Parameters:
   DomainName:
     Description: Domain name for your website (example.com)
     Type: String
+  Environment:
+    Description: 'AWS or AWS-SAM-LOCAL'
+    Type: String
+    Default: 'AWS'
+    AllowedValues: 
+      - 'AWS'
+      - 'AWS-SAM-LOCAL'     
+  PathToAPI:
+    Description: 'The path to the API for API Gateway'
+    Type: String 
+    Default: '/'
+    AllowedValues: 
+      - '/'
+      - '/friends'     
   # Link below, introduces a parameter-values parameter for the AWS-SAM-LOCAL cli commands.
   # Using this parameter to distinguish between AWS CodePipeline use of this
   # SAM file and the way AWS-SAM-LOCAL uses this SAM file.
@@ -45,14 +59,7 @@ Parameters:
     Default: ''
     AllowedValues: 
       - ''
-      - dist/
-  Environment:
-    Description: 'AWS or AWS-SAM-LOCAL'
-    Type: String
-    Default: 'AWS'
-    AllowedValues: 
-      - 'AWS'
-      - 'AWS-SAM-LOCAL'        
+      - dist/       
 
 Conditions:
   IsAWS: !Equals [!Ref Environment, 'AWS']

@@ -1,8 +1,9 @@
 {
   "Parameters" : {
     "DomainName" : "api.edbrennan.guru",
-    "PathToHandler" : "",
-    "Environment" : "AWS"
+    "Environment" : "AWS",
+    "PathToAPI" : "/",
+    "PathToHandler" : ""
   },
   "StackPolicy" : {
     "Statement" : [
