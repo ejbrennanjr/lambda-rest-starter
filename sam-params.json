@@ -2,7 +2,7 @@
   "Parameters" : {
     "DomainName" : "api.edbrennan.guru",
     "Environment" : "AWS",
-    "PathToAPI" : "/",
+    "PathToAPI" : "/friends",
     "PathToHandler" : ""
   },
   "StackPolicy" : {
