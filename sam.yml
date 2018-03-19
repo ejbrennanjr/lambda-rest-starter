@@ -67,6 +67,42 @@ Conditions:
 
 Resources:
 
+  FriendsRole:
+    DependsOn: FriendsTable
+    Type: AWS::IAM::Role
+    Description: 'IAM Role for the Friends Lambda Function'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [lambda.amazonaws.com]
+          Action: sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: !Sub '${AWS::StackName}-lambda-role-iam'
+          PolicyDocument:
+            Statement: 
+              - Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents                
+                Effect: Allow
+                Resource: '*'
+              - Action:
+                - dynamodb:BatchGetItem
+                - dynamodb:BatchWriteItem
+                - dynamodb:GetItem
+                - dynamodb:Query
+                - dynamodb:Scan
+                - dynamodb:PutItem
+                - dynamodb:UpdateItem               
+                Effect: Allow
+                Resource: !Sub '${FriendsTable.Arn}'          
+
+
+
   FriendsApi:
     Type: AWS::Serverless::Api
     Condition: IsAWS
@@ -100,6 +136,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: !Sub '${PathToHandler}index.handler'
+      Role: !Sub '${FriendsRole.Arn}'
       Runtime: nodejs6.10
       CodeUri: ./dist/ 
       FunctionName: 
