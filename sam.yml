@@ -104,14 +104,21 @@ Resources:
         - '${AWS::StackName}--lambda-${NoSpaceRegion}'
         - NoSpaceRegion: !Join ['', !Split ['-', !Ref 'AWS::Region']]
       Events:
-        ListFriends:
+        ListFriendsLocal:
           Type: Api
+          Condition: IsAWS
           Properties:
-            Path: 
-              Fn::Sub:
-                '${PathToAPI}'
+            Path: /friends
             Method: get
             RestApiId: !Ref FriendsApi
+        ListFriends:
+          Type: Api
+          Condition: IsAWS          
+          Properties:
+            Path: /
+            Method: get
+            RestApiId: !Ref FriendsApi            
+            
 
 
   BasePathMapping:
