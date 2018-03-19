@@ -107,7 +107,8 @@ Resources:
         ListFriends:
           Type: Api
           Properties:
-            Path: !Sub '${PathToAPI}'
+            Path: 
+              Ref: PathToAPI
             Method: get
             RestApiId: !Ref FriendsApi
 
