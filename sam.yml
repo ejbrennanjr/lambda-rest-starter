@@ -63,6 +63,7 @@ Parameters:
 
 Conditions:
   IsAWS: !Equals [!Ref Environment, 'AWS']
+  IsLocal: !Equals [!Ref Environment, 'AWS-SAM-LOCAL']
 
 Resources:
 
@@ -106,7 +107,7 @@ Resources:
       Events:
         ListFriendsLocal:
           Type: Api
-          Condition: IsAWS
+          Condition: IsLocal
           Properties:
             Path: /friends
             Method: get
