@@ -108,7 +108,8 @@ Resources:
           Type: Api
           Properties:
             Path: 
-              Ref: PathToAPI
+              Fn::Sub:
+                '${PathToAPI}'
             Method: get
             RestApiId: !Ref FriendsApi
 
