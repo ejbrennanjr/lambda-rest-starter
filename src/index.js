@@ -52,7 +52,7 @@ exports.handler = (event, context, callback) => {
                         "Access-Control-Allow-Credentials" : "true",
                         "Vary": "Origin"
                     },
-                    body: JSON.stringify(items)
+                    body: JSON.stringify(items.Items)
                   };
 
                 callback(null, response);
