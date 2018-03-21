@@ -37,8 +37,8 @@ exports.handler = (event, context, callback) => {
 
         case "GET":
 
-            var params = {
-                TableName: 'ebrennanguru.friends',
+            var params = {  
+                TableName: 'edbrennanguru.friends',
                 ReturnConsumedCapacity: 'TOTAL'
             };
 
