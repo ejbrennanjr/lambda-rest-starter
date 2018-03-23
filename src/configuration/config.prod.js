@@ -1,1 +1,2 @@
-export const allowOrigin = 'https://edbrennan.guru';
+module.exports.allowOrigin = 'https://edbrennan.guru';
+

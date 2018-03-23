@@ -1,6 +1,6 @@
 'use strict';
 var AWS = require('aws-sdk');
-var allowOrigin = require('./configuration/config');
+var config = require('./configuration/config');
 
 
 exports.handler = (event, context, callback) => {
@@ -46,7 +46,7 @@ exports.handler = (event, context, callback) => {
                 const response = {
                     statusCode: 200,
                     headers: {
-                        "Access-Control-Allow-Origin" : allowOrigin,
+                        "Access-Control-Allow-Origin" : config.allowOrigin,
                         "Access-Control-Allow-Credentials" : "true",
                         "Vary": "Origin"
                     },
