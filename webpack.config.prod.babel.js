@@ -16,7 +16,8 @@ export default {
     entry: path.resolve(__dirname, 'src/index'),
     target: 'node',    
     plugins: [
-        new CleanWebpackPlugin(['dist'])
+        new CleanWebpackPlugin(['dist']),
+        new webpack.DefinePlugin(GLOBALS)
     ],  
     output: {
         filename: 'index.js',
