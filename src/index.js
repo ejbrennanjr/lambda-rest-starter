@@ -1,5 +1,6 @@
 'use strict';
 var AWS = require('aws-sdk');
+var allowOrigin = require('./configuration/config');
 
 
 
