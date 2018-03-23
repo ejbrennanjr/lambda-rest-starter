@@ -3,7 +3,6 @@ var AWS = require('aws-sdk');
 var allowOrigin = require('./configuration/config');
 
 
-
 exports.handler = (event, context, callback) => {
 
     AWS.config.update({region: 'us-east-1'});
@@ -30,8 +29,6 @@ exports.handler = (event, context, callback) => {
         },  
     ];
     
-    const allowOrigin = process.env.NODE_ENV === 'production' ? 'https://edbrennan.guru'
-                                                              : 'http://localhost:3000';
 
 
     switch(event.httpMethod){
